@@ -53,23 +53,6 @@ $(document).ready(function () {
     var p1Choice = "";
     var p2Choice = "";
 
-    // $(document).on("keyup", "#player", function (event) {
-
-    //     if (event.keyCode === 13) {
-    //         // Trigger the button element to submit using enter
-    //         $("#playerSubmit").click();
-    //     }
-    // });
-
-    // $(document).on("keyup", "#playerMessage", function (event) {
-
-    //     if (event.keyCode === 13) {
-    //         // Trigger the button element to submit using enter
-    //         $("#messageSubmit").click();
-    //     }
-    // });
-
-    // choose first or second player, hide the other button prevents a bug with usernamelock
     $("#selectPlayerOne").on("click", function () {
         if (firstPlayerChosen) {
             alert("Player one is already chosen");
@@ -81,7 +64,6 @@ $(document).ready(function () {
             database.ref().update({ firstPlayerChosen: firstPlayerChosen });
         }
     });
-
 
     $("#selectPlayerTwo").on("click", function () {
         if (secondPlayerChosen) {
@@ -292,6 +274,21 @@ $(document).ready(function () {
 
     };
 
+
+    function displayTie(){
+        winner = players.playerOne.name + " and " + players.playerTwo.name + " have tied";
+        setTimeout(function () {
+            playerHasWon = false;
+            firstPlayerTurn = true;
+            database.ref().update({
+                firstPlayerTurn: firstPlayerTurn,
+                playerHasWon: playerHasWon,
+
+            });
+        }, 3200);
+
+    };
+
     function evaluateChoices() {
 
         if (players.playerOne.choice === rock && players.playerTwo.choice === scissors) {
@@ -307,7 +304,7 @@ $(document).ready(function () {
             firebaseUpdatePlayerStats();
         }
         else if (players.playerOne.choice === players.playerTwo.choice) {
-            winner = players.playerOne.name + " and " + players.playerTwo.name + " have tied";
+            displayTie();
             firebaseUpdatePlayerStats();
         }
         else {
@@ -352,6 +349,16 @@ $(document).ready(function () {
         else if (playerHasWon) {
             debugger;
             displayTurn = $("#displayTurn").text(snapshot.val().winner);
+            $(displayTurn).addClass("displayStyle");
+            var displayChoice1 = $("#displayTurn").append("<br>" + players.playerOne.name + ": " + snapshot.val().p1Choice + "<br>");
+            
+            var displayChoice2 = $("#displayTurn").append(players.playerTwo.name + ": " + snapshot.val().p2Choice);
+            $(displayChoice1).addClass("displayStyle");
+            $(displayChoice2).addClass("displayStyle");
+
+        }
+        else  {
+                  displayTurn = $("#displayTurn").text(snapshot.val().winner);
             $(displayTurn).addClass("displayStyle");
             var displayChoice1 = $("#displayTurn").append("<br>" + players.playerOne.name + ": " + snapshot.val().p1Choice + "<br>");
             
