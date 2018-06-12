@@ -1,0 +1,116 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+        crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>
+
+
+</head>
+
+<body>
+    <div class = "container"id="startPage">
+        <div class = "row">
+            <h1> Select a player</h1>
+        </div>
+<div class ="row"id = "selectPlayerDiv">
+    <button id = "selectPlayerOne">Player One</button>
+    <button id = "selectPlayerTwo">Player Two</button>
+</div>
+</div>
+    <div id="wholePageDiv" class="container">
+
+        <div class="row col-lg-12">
+            <form>
+                <h1>Enter a username</h1>
+                <input type='text' id='player' placeholder='Choose a username'>
+                <input type='submit' id='playerSubmit' value="Enter">
+            </form>
+        </div>
+        <div class = "row">
+            <div class = "col-lg-4" id="displayTurn"></div>
+            <div class = "col-lg-4"></div>
+
+            <div id = "messageBox" class = "col-lg-4">
+                <h3>Messages</h3>
+                <form>
+                <div class = "display" id = "messageArea"></div>
+                <input type='text' id='playerMessage' placeholder=''>
+                <button type="submit" id='messageSubmit' >Send</button>
+                </form>
+                <h3>reset the game</h3>
+                <button id="nameReset">reset</button>
+            </div>
+
+
+
+            
+        </div>
+        <div id ="gameStyle" class="row col-lg-12">
+            <h1 id="winner"></h1>
+        </div>
+        <div class="row">
+            <div id="playerOneSide" class="col-lg-6">
+                <div>
+
+                    <h1 id="playerOneName"></h1>
+                </div>
+                <div id="playerOneButtons">
+
+                    <button class="playerOneChoice">rock</button>
+                    <button class="playerOneChoice">paper</button>
+                    <button class="playerOneChoice">scissors</button>
+                    <div id="displayPlayerOneChoice"></div>
+                </div>
+
+                <div id="playerOneStats"></div>
+
+            </div>
+            <div id="playerTwoSide" class="col-lg-6">
+                <div>
+                    <h1 id="playerTwoName"></h1>
+                </div>
+                <div id="playerTwoButtons">
+
+                    <button class="playerTwoChoice">rock</button>
+                    <button class="playerTwoChoice">paper</button>
+                    <button class="playerTwoChoice">scissors</button>
+                    <div id="displayPlayerTwoChoice"></div>
+                </div>
+
+                <div id="playerTwoStats"></div>
+            </div>
+
+        </div>
+
+       
+ 
+        <div class="row">
+          
+            </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script type="text/javascript" src="assets/javascript.js"></script>
+
+
+</body>
+
+<!--    I3LIxn3wdbBKTNOyOvfS4UCk3TvTUwrY         onfocus="this.value=''"  onblur="this.value=''"    onload="createStartingAnimals()"          -->
+
+</html>

@@ -1,0 +1,40 @@
+.username {
+    align-content: center;
+}
+
+
+textarea {
+    width: 450px;
+    height: 200px;
+}
+
+#gameStyle {
+    margin-top: 20%;
+}
+#messageBox {
+    margin-top: 5%;
+}
+.display {
+    width: 450px;
+    height: 200px;
+    background-color: white;
+    border-width:2px;
+    border-style:solid;
+    border-color:darkgray;
+    padding-left: 6px;
+ 
+}
+body {
+    background-image: url(images/circles-dark.png);
+
+}
+.bold{
+    font-weight: bold;
+}
+.displayStyle {
+    font-size: 37px;
+    background-color: white;
+    border-width:2px;
+    border-style:solid;
+    border-color:darkgray;
+}
