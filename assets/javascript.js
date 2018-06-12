@@ -29,7 +29,7 @@ $(document).ready(function () {
     };
     // link firebase
     var database = firebase.database();
-    var refP1 = database.ref("players/playerOne/name");
+    //reference to the second player
     var refP2 = database.ref("players/playerTwo/name");
 
     var rock = "rock";
@@ -38,53 +38,59 @@ $(document).ready(function () {
     //switches for playing the game 
     var firstPlayerChosen = false;
     var secondPlayerChosen = false;
+    //locks buttons until players are chosen
     var buttonLockOn = true;
+    //locks username so player 1 or 2 must be chosen first
     var usernameLock = true;
+    //switches for game turns to function
     var firstPlayerTurn = true;
     var secondPlayerTurn = false;
+    //switch to display waiting for players while players are choosing names and positions
     var waitingForPlayers = true;
+    //switch to display when player won and both user choices
     var playerHasWon = false;
 
     // used for stats and messaging 
     var winner = "";
+    // reference for firebase, holds wins and losses
     var statsP1 = "";
     var statsP2 = "";
+    // reference for messaging app
     var userName = "";
+    // reference for player choice to display
     var p1Choice = "";
     var p2Choice = "";
 
+
+
+    function firebaseUpdatePlayer(playerChosen, selector) {
+        usernameLock = false;
+        selector.hide();
+        database.ref().update({ playerChosen: playerChosen });
+    };
+
+
+
+    // select player 1
     $("#selectPlayerOne").on("click", function () {
-        if (firstPlayerChosen) {
-            alert("Player one is already chosen");
-        }
-        else {
-            firstPlayerChosen = true;
-            usernameLock = false;
-            $("#selectPlayerTwo").hide();
-            database.ref().update({ firstPlayerChosen: firstPlayerChosen });
-        }
-    });
+        var select = $("#selectPlayerTwo");
+        firstPlayerChosen ? alert("Player One is already chosen") : firstPlayerChosen = true; firebaseUpdatePlayer(firstPlayerChosen, select);
 
+    });
+    // select player 2
     $("#selectPlayerTwo").on("click", function () {
-        if (secondPlayerChosen) {
-            alert("Player two is already chosen")
-        }
-        else {
-            secondPlayerChosen = true;
-            usernameLock = false;
-            $("#selectPlayerOne").hide();
-            database.ref().update({ secondPlayerChosen: secondPlayerChosen });
-        }
+        var select = $("#selectPlayerOne");
+        secondPlayerChosen ? alert("Player Two is already chosen") : secondPlayerChosen = true; firebaseUpdatePlayer(secondPlayerChosen, select);
 
     });
 
+    // choose name for player 1 or 2
     $("#playerSubmit").on("click", function () {
 
         event.preventDefault();
         if (usernameLock) {
             alert("Please select a player");
         }
-
         else if (secondPlayerChosen) {
             players.playerTwo.name = $("#player").val().trim();
             var name = $("#player").val().trim();
@@ -98,11 +104,8 @@ $(document).ready(function () {
             waitingForPlayers = false;
 
             database.ref().update({ buttonLockOn: buttonLockOn, waitingForPlayers: waitingForPlayers });
-            // database.ref().push()
-
 
         }
-
         else if (firstPlayerChosen) {
             players.playerOne.name = $("#player").val().trim();
             var name = $("#player").val().trim();
@@ -111,17 +114,13 @@ $(document).ready(function () {
             console.log(players.playerOne.name);
             $("#player").val("");
 
-
             database.ref().update({
                 players: players
             });
             $("#playerTwoButtons").hide();
         }
     });
-
-
-
-
+    //onclick listener for what player one chooses, rock/paper/scissors
     $(".playerOneChoice").on("click", function () {
         if (buttonLockOn) {
             alert("players must be chosen first");
@@ -132,7 +131,6 @@ $(document).ready(function () {
         else {
             players.playerOne.choice = $(this).text().trim();
             p1Choice = $(this).text().trim();
-            console.log(players.playerOne.choice);
             database.ref("players/playerOne").update({
                 choice: players.playerOne.choice
             });
@@ -145,7 +143,7 @@ $(document).ready(function () {
             });
         }
     });
-
+    //onclick listener for what player two chooses, rock/paper/scissors
     $(".playerTwoChoice").on("click", function () {
         if (buttonLockOn) {
             alert("players must be chosen first")
@@ -156,17 +154,13 @@ $(document).ready(function () {
         else {
             players.playerTwo.choice = $(this).text().trim();
             p2Choice = $(this).text().trim();
-
-            console.log(players.playerTwo.choice);
             evaluateChoices();
             database.ref("players/playerTwo").update({
 
                 choice: players.playerTwo.choice
             });
-
             secondPlayerTurn = false;
             database.ref().update({
-
                 secondPlayerTurn: secondPlayerTurn,
                 p2Choice: p2Choice
             });
@@ -176,10 +170,7 @@ $(document).ready(function () {
     //messaging application 
     $(document).on("click", "#messageSubmit", function () {
         event.preventDefault();
-
-
         var message = userName + ": ".bold() + $("#playerMessage").val();
-        //$("#messageArea").append(players.playerOne.name + ": " + message);
         $("#playerMessage").val("");
 
         database.ref("message").push({
@@ -192,7 +183,7 @@ $(document).ready(function () {
         $("#messageArea").append(snapshot.val().message + "<br>");
 
     });
-
+// reset game
     $("#nameReset").on("click", function () {
         players.playerOne.name = "";
         players.playerTwo.name = "";
@@ -209,9 +200,6 @@ $(document).ready(function () {
         var statsP2 = "";
         message = "";
         location.reload();
-
-
-
 
         database.ref().update({
 
@@ -230,7 +218,6 @@ $(document).ready(function () {
         });
 
     });
-
 
     //updates stats to firebase based after the evaluateChoices function runs
     function firebaseUpdatePlayerStats() {
@@ -269,13 +256,10 @@ $(document).ready(function () {
                 playerHasWon: playerHasWon,
 
             });
-        }, 3200);
-
+        }, 3000);
 
     };
-
-
-    function displayTie(){
+    function displayTie() {
         winner = players.playerOne.name + " and " + players.playerTwo.name + " have tied";
         setTimeout(function () {
             playerHasWon = false;
@@ -285,10 +269,9 @@ $(document).ready(function () {
                 playerHasWon: playerHasWon,
 
             });
-        }, 3200);
+        }, 3000);
 
     };
-
     function evaluateChoices() {
 
         if (players.playerOne.choice === rock && players.playerTwo.choice === scissors) {
@@ -311,19 +294,13 @@ $(document).ready(function () {
             selectWinner(players.playerTwo.name, players.playerTwo.wins++, players.playerOne.losses++);
             firebaseUpdatePlayerStats();
         }
-
     };
 
     database.ref().on("value", function (snapshot) {
-
-
-
         // Change the HTML
-
         $("#playerOneStats").text(snapshot.val().statsP1);
         $("#playerTwoStats").text(snapshot.val().statsP2);
         // $("#messageArea").append(players.playerOne.name + snapshot.val().message + "\n");
-
 
         buttonLockOn = snapshot.val().buttonLockOn;
         firstPlayerChosen = snapshot.val().firstPlayerChosen;
@@ -351,28 +328,23 @@ $(document).ready(function () {
             displayTurn = $("#displayTurn").text(snapshot.val().winner);
             $(displayTurn).addClass("displayStyle");
             var displayChoice1 = $("#displayTurn").append("<br>" + players.playerOne.name + ": " + snapshot.val().p1Choice + "<br>");
-            
+
             var displayChoice2 = $("#displayTurn").append(players.playerTwo.name + ": " + snapshot.val().p2Choice);
             $(displayChoice1).addClass("displayStyle");
             $(displayChoice2).addClass("displayStyle");
 
         }
-        else  {
-                  displayTurn = $("#displayTurn").text(snapshot.val().winner);
+        else {
+            displayTurn = $("#displayTurn").text(snapshot.val().winner);
             $(displayTurn).addClass("displayStyle");
             var displayChoice1 = $("#displayTurn").append("<br>" + players.playerOne.name + ": " + snapshot.val().p1Choice + "<br>");
-            
+
             var displayChoice2 = $("#displayTurn").append(players.playerTwo.name + ": " + snapshot.val().p2Choice);
             $(displayChoice1).addClass("displayStyle");
             $(displayChoice2).addClass("displayStyle");
 
         }
 
-
-
-
-
-        // If any errors are experienced, log them to console.
     }, function (errorObject) {
         console.log("The read failed: " + errorObject.code);
     });
@@ -384,9 +356,6 @@ $(document).ready(function () {
         $("#playerOneName").text(snapshot.val().name);
         $("#displayPlayerOneChoice").text(snapshot.val().choice);
 
-        // $("#playerOneStats").text(snapshot.val().wins);
-        // $("#playerOneStats").text(snapshot.val().losses);
-
     });
 
     database.ref("players/playerTwo").on("value", function (snapshot) {
@@ -395,8 +364,6 @@ $(document).ready(function () {
 
         $("#playerTwoName").text(snapshot.val().name);
         $("#displayPlayerTwoChoice").text(snapshot.val().choice);
-        // $("#playerTwoStats").text(snapshot.val().wins);
-        // $("#playerTwoStats").text(snapshot.val().losses);
 
     });
 
