@@ -62,14 +62,91 @@ $(document).ready(function () {
     var p2Choice = "";
 
 
-
+//function for choosing player, continuning game.
     function firebaseUpdatePlayer(playerChosen, selector) {
         usernameLock = false;
         selector.hide();
         database.ref().update({ playerChosen: playerChosen });
     };
 
+    //updates stats to firebase based after the evaluateChoices function runs
+    function firebaseUpdatePlayerStats() {
+        statsP1 = "Wins: " + players.playerOne.wins + "Losses: " + players.playerOne.losses;
+        statsP2 = "Wins: " + players.playerTwo.wins + "Losses: " + players.playerTwo.losses;
+        database.ref().update({
+            winner: winner,
+            statsP1: statsP1,
+            statsP2: statsP2,
+            playerHasWon: playerHasWon,
+            p1Choice: p1Choice,
+            p2Choice: p2Choice
+        });
 
+        database.ref("players/playerOne").update({
+            wins: players.playerOne.wins,
+            losses: players.playerOne.losses
+        });
+        database.ref("players/playerTwo").update({
+            wins: players.playerTwo.wins,
+            losses: players.playerTwo.losses
+
+        });
+    };
+// selects which char won and attributes wins/losses
+    function selectWinner(player, winningPlayer, losingPlayer) {
+        winner = player + " wins";
+        winningPlayer;
+        losingPlayer;
+        playerHasWon = true;
+        setTimeout(function () {
+            playerHasWon = false;
+            firstPlayerTurn = true;
+            database.ref().update({
+                firstPlayerTurn: firstPlayerTurn,
+                playerHasWon: playerHasWon,
+
+            });
+        }, 3000);
+
+    };
+    // tie version of the display winner function
+    function displayTie() {
+        winner = players.playerOne.name + " and " + players.playerTwo.name + " have tied";
+        setTimeout(function () {
+            playerHasWon = false;
+            firstPlayerTurn = true;
+            database.ref().update({
+                firstPlayerTurn: firstPlayerTurn,
+                playerHasWon: playerHasWon,
+
+            });
+        }, 3000);
+
+    };
+    //main game control function, evaluates what each char chose.
+    function evaluateChoices() {
+
+        if (players.playerOne.choice === rock && players.playerTwo.choice === scissors) {
+            selectWinner(players.playerOne.name, players.playerOne.wins++, players.playerTwo.losses++);
+            firebaseUpdatePlayerStats();
+        }
+        else if (players.playerOne.choice === paper && players.playerTwo.choice === rock) {
+            selectWinner(players.playerOne.name, players.playerOne.wins++, players.playerTwo.losses++);
+            firebaseUpdatePlayerStats();
+        }
+        else if (players.playerOne.choice === scissors && players.playerTwo.choice === paper) {
+            selectWinner(players.playerOne.name, players.playerOne.wins++, players.playerTwo.losses++);
+            firebaseUpdatePlayerStats();
+        }
+        else if (players.playerOne.choice === players.playerTwo.choice) {
+            displayTie();
+            firebaseUpdatePlayerStats();
+        }
+        else {
+            selectWinner(players.playerTwo.name, players.playerTwo.wins++, players.playerOne.losses++);
+            firebaseUpdatePlayerStats();
+        }
+    };
 
     // select player 1
     $("#selectPlayerOne").on("click", function () {
@@ -183,7 +260,7 @@ $(document).ready(function () {
         $("#messageArea").append(snapshot.val().message + "<br>");
 
     });
-// reset game
+    // reset game
     $("#nameReset").on("click", function () {
         players.playerOne.name = "";
         players.playerTwo.name = "";
@@ -219,88 +296,12 @@ $(document).ready(function () {
 
     });
 
-    //updates stats to firebase based after the evaluateChoices function runs
-    function firebaseUpdatePlayerStats() {
-        statsP1 = "Wins: " + players.playerOne.wins + "Losses: " + players.playerOne.losses;
-        statsP2 = "Wins: " + players.playerTwo.wins + "Losses: " + players.playerTwo.losses;
-        database.ref().update({
-            winner: winner,
-            statsP1: statsP1,
-            statsP2: statsP2,
-            playerHasWon: playerHasWon,
-            p1Choice: p1Choice,
-            p2Choice: p2Choice
-        });
 
-        database.ref("players/playerOne").update({
-            wins: players.playerOne.wins,
-            losses: players.playerOne.losses
-        });
-        database.ref("players/playerTwo").update({
-            wins: players.playerTwo.wins,
-            losses: players.playerTwo.losses
-
-        });
-    };
-
-    function selectWinner(player, winningPlayer, losingPlayer) {
-        winner = player + " wins";
-        winningPlayer;
-        losingPlayer;
-        playerHasWon = true;
-        setTimeout(function () {
-            playerHasWon = false;
-            firstPlayerTurn = true;
-            database.ref().update({
-                firstPlayerTurn: firstPlayerTurn,
-                playerHasWon: playerHasWon,
-
-            });
-        }, 3000);
-
-    };
-    function displayTie() {
-        winner = players.playerOne.name + " and " + players.playerTwo.name + " have tied";
-        setTimeout(function () {
-            playerHasWon = false;
-            firstPlayerTurn = true;
-            database.ref().update({
-                firstPlayerTurn: firstPlayerTurn,
-                playerHasWon: playerHasWon,
-
-            });
-        }, 3000);
-
-    };
-    function evaluateChoices() {
-
-        if (players.playerOne.choice === rock && players.playerTwo.choice === scissors) {
-            selectWinner(players.playerOne.name, players.playerOne.wins++, players.playerTwo.losses++);
-            firebaseUpdatePlayerStats();
-        }
-        else if (players.playerOne.choice === paper && players.playerTwo.choice === rock) {
-            selectWinner(players.playerOne.name, players.playerOne.wins++, players.playerTwo.losses++);
-            firebaseUpdatePlayerStats();
-        }
-        else if (players.playerOne.choice === scissors && players.playerTwo.choice === paper) {
-            selectWinner(players.playerOne.name, players.playerOne.wins++, players.playerTwo.losses++);
-            firebaseUpdatePlayerStats();
-        }
-        else if (players.playerOne.choice === players.playerTwo.choice) {
-            displayTie();
-            firebaseUpdatePlayerStats();
-        }
-        else {
-            selectWinner(players.playerTwo.name, players.playerTwo.wins++, players.playerOne.losses++);
-            firebaseUpdatePlayerStats();
-        }
-    };
 
     database.ref().on("value", function (snapshot) {
         // Change the HTML
         $("#playerOneStats").text(snapshot.val().statsP1);
         $("#playerTwoStats").text(snapshot.val().statsP2);
-        // $("#messageArea").append(players.playerOne.name + snapshot.val().message + "\n");
 
         buttonLockOn = snapshot.val().buttonLockOn;
         firstPlayerChosen = snapshot.val().firstPlayerChosen;
