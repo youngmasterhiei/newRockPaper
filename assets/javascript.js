@@ -277,7 +277,7 @@ $(document).ready(function () {
         var statsP2 = "";
         message = "";
         location.reload();
-
+// update firebase on reset
         database.ref().update({
 
             buttonLockOn: buttonLockOn,
@@ -302,7 +302,7 @@ $(document).ready(function () {
         // Change the HTML
         $("#playerOneStats").text(snapshot.val().statsP1);
         $("#playerTwoStats").text(snapshot.val().statsP2);
-
+//watches for changes in firebase sends a snapshot back
         buttonLockOn = snapshot.val().buttonLockOn;
         firstPlayerChosen = snapshot.val().firstPlayerChosen;
         firstPlayerTurn = snapshot.val().firstPlayerTurn;
@@ -311,6 +311,7 @@ $(document).ready(function () {
         playerHasWon = snapshot.val().playerHasWon;
         p1Choice = snapshot.val().p1Choice;
         p2Choice = snapshot.val().p2Choice;
+        //displays html depending on certain conditions
         if (waitingForPlayers) {
             var displayTurn = $("#displayTurn").text("waiting for players...");
             $(displayTurn).addClass("displayStyle");
@@ -349,7 +350,7 @@ $(document).ready(function () {
     }, function (errorObject) {
         console.log("The read failed: " + errorObject.code);
     });
-
+//snapshot of data from specific reference, display to html
     database.ref("players/playerOne").on("value", function (snapshot) {
         players.playerOne.name = snapshot.val().name;
         players.playerOne.choice = snapshot.val().choice;
@@ -358,6 +359,7 @@ $(document).ready(function () {
         $("#displayPlayerOneChoice").text(snapshot.val().choice);
 
     });
+//snapshot of data from specific reference, display to html
 
     database.ref("players/playerTwo").on("value", function (snapshot) {
         players.playerTwo.name = snapshot.val().name;
